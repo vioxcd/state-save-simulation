@@ -65,7 +65,7 @@ def save_state_on_n_processed_state(f, STATE):
     def counter_wrapper(*args, **kwargs):
         unprocessed_state = STATE[0] - STATE[1]
 
-        if len(STATE[1]) != 0 and len(unprocessed_state) % count == 0:  # isn't just starting & have processed n states
+        if len(STATE[1]) != 0 and len(STATE[1]) % count == 0:
             print(f'\n{count} state have been processed\nSaving state...')
             dump_state(unprocessed_state)
 
