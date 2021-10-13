@@ -39,19 +39,19 @@ def save_state_on_interrupt(STATE, signalNumber, frame):
 
 def save_state_on_time_passing(f, STATE):
     """save state by periodically checking time elapsed"""
-    count = 0
+    seconds = 0
     last_invoked = time.time()
 
     def timer_wrapper(*args, **kwargs):
         nonlocal last_invoked
-        nonlocal count
+        nonlocal seconds
         elapsed_time = time.time() - last_invoked
 
         if elapsed_time > 5:
             last_invoked = time.time()
-            count += 5
+            seconds += 5
 
-            print(f'\n{count} seconds have passed\nSaving state...')
+            print(f'\n{seconds} seconds have passed\nSaving state...')
             unprocessed_state = STATE[0] - STATE[1]
             dump_state(unprocessed_state)
 
