@@ -37,7 +37,7 @@ def save_state_on_interrupt(STATE, signalNumber, frame):
     dump_state(unprocessed_state)
     sys.exit(1)
 
-def save_state_on_time_passing(f):
+def save_state_on_time_passing(f, STATE):
     """save state by periodically checking time elapsed"""
     count = 0
     last_invoked = time.time()
@@ -52,17 +52,22 @@ def save_state_on_time_passing(f):
             count += 5
 
             print(f'\n{count} seconds have passed\nSaving state...')
-            # unprocessed_state = STATE[0] - STATE[1]
-            # dump_state(unprocessed_state)
+            unprocessed_state = STATE[0] - STATE[1]
+            dump_state(unprocessed_state)
 
         return f(*args, **kwargs)
     return timer_wrapper
 
-@save_state_on_time_passing
+# @save_state_on_time_passing
 def process_state(processed_state, state):
     print(f'processing state: {state}')
     processed_state.add(state)
     time.sleep(1)
+
+def save_state_handler(f, save_state_by_function, STATE):
+    """take a processing function to run & a state to keep track of"""
+    f = save_state_by_function(f, STATE)  # decorate running function
+    return f
 
 if __name__ == '__main__':
     # reference
@@ -78,6 +83,9 @@ if __name__ == '__main__':
     # output current process id
     print('My PID is:', os.getpid())
     
+    # add save state by time passing to process_state
+    process_state = save_state_handler(process_state, save_state_on_time_passing, STATE)
+
     # simulate processing some state
     for state in some_state:
         process_state(processed_state, state)
