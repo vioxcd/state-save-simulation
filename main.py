@@ -47,9 +47,9 @@ def save_state_on_time_passing(f, STATE):
         nonlocal seconds
         elapsed_time = time.time() - last_invoked
 
-        if elapsed_time > 5:
+        if elapsed_time > 30:
             last_invoked = time.time()
-            seconds += 5
+            seconds += 30
 
             print(f'\n{seconds} seconds have passed\nSaving state...')
             unprocessed_state = STATE[0] - STATE[1]
@@ -60,7 +60,7 @@ def save_state_on_time_passing(f, STATE):
 
 def save_state_on_n_processed_state(f, STATE):
     """save state by periodically checking count of processed state"""
-    count = 5
+    count = 10
 
     def counter_wrapper(*args, **kwargs):
         unprocessed_state = STATE[0] - STATE[1]
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     print('My PID is:', os.getpid())
     
     # add save state by time passing to process_state
-    # process_state = save_state_handler(process_state, save_state_on_time_passing, STATE)
+    process_state = save_state_handler(process_state, save_state_on_time_passing, STATE)
     process_state = save_state_handler(process_state, save_state_on_n_processed_state, STATE)
 
     # simulate processing some state
