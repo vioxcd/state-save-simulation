@@ -37,6 +37,33 @@ def save_state_on_interrupt(STATE, signalNumber, frame):
     dump_state(unprocessed_state)
     sys.exit(1)
 
+def save_state_on_time_passing(f):
+    """save state by periodically checking time elapsed"""
+    count = 0
+    last_invoked = time.time()
+
+    def timer_wrapper(*args, **kwargs):
+        nonlocal last_invoked
+        nonlocal count
+        elapsed_time = time.time() - last_invoked
+
+        if elapsed_time > 5:
+            last_invoked = time.time()
+            count += 5
+
+            print(f'\n{count} seconds have passed\nSaving state...')
+            # unprocessed_state = STATE[0] - STATE[1]
+            # dump_state(unprocessed_state)
+
+        return f(*args, **kwargs)
+    return timer_wrapper
+
+@save_state_on_time_passing
+def process_state(processed_state, state):
+    print(f'processing state: {state}')
+    processed_state.add(state)
+    time.sleep(1)
+
 if __name__ == '__main__':
     # reference
     # signal: https://stackabuse.com/handling-unix-signals-in-python/
@@ -53,6 +80,4 @@ if __name__ == '__main__':
     
     # simulate processing some state
     for state in some_state:
-        print(f'processing state: {state}')
-        processed_state.add(state)
-        time.sleep(1)
+        process_state(processed_state, state)
