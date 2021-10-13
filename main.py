@@ -22,7 +22,11 @@ def load_state():
 
     return load_file(FILE_TO_PROCESS)
 
-def save_state(STATE, signalNumber, frame):
+def dump_state(state, target=FILE_TO_CONTINUE_FROM):
+    with open(target, 'w') as f:
+        f.writelines('\n'.join(state))
+
+def save_state_on_interrupt(STATE, signalNumber, frame):
     """signal handler. saving state when interrupt received"""
     print('\nInterrupt Received\nSaving state...')
 
@@ -30,9 +34,7 @@ def save_state(STATE, signalNumber, frame):
     unprocessed_state = STATE[0] - STATE[1]
 
     # dump state
-    with open(FILE_TO_CONTINUE_FROM, 'w') as f:
-        f.writelines('\n'.join(unprocessed_state))
-    
+    dump_state(unprocessed_state)
     sys.exit(1)
 
 if __name__ == '__main__':
@@ -44,9 +46,9 @@ if __name__ == '__main__':
     processed_state = set()
 
     STATE = (some_state, processed_state)  # tuple for easier lookups
-    signal.signal(signal.SIGINT, partial(save_state, STATE))
+    signal.signal(signal.SIGINT, partial(save_state_on_interrupt, STATE))
 
-	# output current process id
+    # output current process id
     print('My PID is:', os.getpid())
     
     # simulate processing some state
